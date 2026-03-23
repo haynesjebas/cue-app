@@ -10,7 +10,7 @@ import {
 } from './db.js';
 
 // ── Auth ───────────────────────────────────────────────────
-const user = await requireAuth('/login.html');
+const user = await requireAuth('./login.html');
 if (!user) throw new Error('Not authenticated');
 
 // ── State ──────────────────────────────────────────────────
@@ -366,7 +366,7 @@ document.querySelectorAll('.modal [data-type]').forEach(btn => {
 $id('newRitualBtn').addEventListener('click', openRitualModal);
 $id('btnRitualCancel').addEventListener('click', closeRitualModal);
 $id('viewTrendsBtn')?.addEventListener('click', () => {
-  window.location.href = '/progress.html';
+  window.location.href = './progress.html';
 });
 
 $id('newRitualModal').addEventListener('click', e => {

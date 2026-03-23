@@ -48,7 +48,7 @@
       const user = await getUser();
 
       if (!user) {
-        window.location.replace('/login.html');
+        window.location.replace('./login.html');
         return;
       }
 
@@ -57,12 +57,12 @@
       const unlocked    = sessionStorage.getItem('cue_unlocked') === 'true';
 
       if (lockEnabled && !unlocked) {
-        window.location.replace('/lock.html');
+        window.location.replace('./lock.html');
         return;
       }
 
       // Default landing page after auth
-      window.location.replace('/habits.html');
+      window.location.replace('./habits.html');
     }
 
     route();

@@ -7,7 +7,7 @@ import { requireAuth, signOut, updatePassword, getInitials } from './auth.js';
 import { getUserProfile, updateProfileName } from './db.js';
 
 // ── Auth ───────────────────────────────────────────────────
-const user = await requireAuth('/login.html');
+const user = await requireAuth('./login.html');
 if (!user) throw new Error('Not authenticated');
 
 // ── DOM helper ─────────────────────────────────────────────

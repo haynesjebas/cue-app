@@ -13,7 +13,7 @@ export function triggerLockIfEnabled() {
   const unlocked    = sessionStorage.getItem('cue_unlocked') === 'true';
 
   if (lockEnabled && !unlocked) {
-    window.location.replace('/lock.html');
+    window.location.replace('./lock.html');
   }
 }
 

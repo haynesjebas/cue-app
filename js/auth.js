@@ -79,7 +79,7 @@ export async function signUpWithEmail(email, password, name) {
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(
     email.trim().toLowerCase(),
-    { redirectTo: `${window.location.origin}/login.html` }
+    { redirectTo: new URL('./login.html', window.location.href).href }
   );
   return { error };
 }
@@ -102,7 +102,7 @@ export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/habits.html`,
+      redirectTo: new URL('./habits.html', window.location.href).href,
     },
   });
   return { error };
@@ -116,7 +116,7 @@ export async function signInWithApple() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
     options: {
-      redirectTo: `${window.location.origin}/habits.html`,
+      redirectTo: new URL('./habits.html', window.location.href).href,
     },
   });
   return { error };
@@ -134,7 +134,7 @@ export async function signOut() {
     localStorage.removeItem('cue_pin_hash');
     localStorage.removeItem('cue_lock_enabled');
     localStorage.removeItem('cue_biometric_enabled');
-    window.location.href = '/login.html';
+    window.location.href = './login.html';
   }
   return { error };
 }
@@ -188,7 +188,7 @@ export function checkLock() {
   const lockEnabled = localStorage.getItem('cue_lock_enabled') === 'true';
   const unlocked = sessionStorage.getItem('cue_unlocked') === 'true';
   if (lockEnabled && !unlocked) {
-    window.location.href = '/lock.html';
+    window.location.href = './lock.html';
     return false;
   }
   return true;

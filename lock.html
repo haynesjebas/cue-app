@@ -226,7 +226,7 @@
   // ── Auth check ─────────────────────────────────────────
   const user = await getUser();
   if (!user) {
-    window.location.replace('/login.html');
+    window.location.replace('./login.html');
   }
 
   // ── PIN state ──────────────────────────────────────────
@@ -286,7 +286,7 @@
 
   function unlock() {
     sessionStorage.setItem('cue_unlocked', 'true');
-    window.location.replace('/habits.html');
+    window.location.replace('./habits.html');
   }
 
   // ── Keypad handler ─────────────────────────────────────

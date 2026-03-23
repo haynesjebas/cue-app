@@ -11,7 +11,7 @@ import {
 import { generateDailyRecap, generateWeeklyNudge } from './ai.js';
 
 // ── Auth ───────────────────────────────────────────────────
-const user = await requireAuth('/login.html');
+const user = await requireAuth('./login.html');
 if (!user) throw new Error('Not authenticated');
 
 // ── State ──────────────────────────────────────────────────

@@ -168,7 +168,7 @@
 
   // ── Redirect if already logged in ─────────────────────
   getUser().then(user => {
-    if (user) window.location.replace('/index.html');
+    if (user) window.location.replace('./index.html');
   });
 
   // ── Toast ──────────────────────────────────────────────
@@ -235,7 +235,7 @@
     }
 
     await upsertUserProfile(user);
-    window.location.replace('/index.html');
+    window.location.replace('./index.html');
   });
 
   // ── Google sign-in ─────────────────────────────────────
