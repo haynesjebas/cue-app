@@ -1,6 +1,3 @@
-# Ignore local configuration files with secrets
-config.js
-
 # standard ignores
 node_modules/
 .DS_Store
