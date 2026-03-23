@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — Moments</title>
+  <meta name="description" content="Your personal journal of milestone moments." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <style>
+    /* Moments-specific layout */
+    .moments-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .moments-grid {
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+
+      .moments-left-col { display: flex; flex-direction: column; gap: 12px; }
+
+      .moments-right-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+    }
+
+    .moments-month-header {
+      padding: 24px 20px 16px;
+    }
+
+    @media (min-width: 768px) {
+      .moments-month-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 28px 32px 20px;
+      }
+    }
+
+    .moments-month-header__title {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    @media (min-width: 768px) {
+      .moments-month-header__title { font-size: 64px; }
+    }
+
+    .moments-month-header__sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .add-moment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--green);
+      color: #000;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .add-moment-pill:hover { opacity: 0.9; }
+
+    /* Tag selector */
+    .tag-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .tag-btn.selected {
+      border-color: transparent;
+    }
+
+    .tag-btn[data-tag="milestone"].selected {
+      background: rgba(34,197,94,0.2);
+      color: var(--green);
+      border-color: rgba(34,197,94,0.3);
+    }
+
+    .tag-btn[data-tag="adventure"].selected {
+      background: rgba(249,115,22,0.2);
+      color: #f97316;
+      border-color: rgba(249,115,22,0.3);
+    }
+
+    .tag-btn[data-tag="reflection"].selected {
+      background: rgba(248,113,113,0.2);
+      color: #f87171;
+      border-color: rgba(248,113,113,0.3);
+    }
+  </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ── SIDEBAR (desktop) ─────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Cue</div>
+      <div class="sidebar__brand-sub">The Ritual</div>
+    </div>
+    <div class="sidebar__nav">
+      <a class="sidebar__item active" href="/moments.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+        Moments
+      </a>
+      <a class="sidebar__item" href="/habits.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Habits
+      </a>
+      <a class="sidebar__item" href="/progress.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Progress
+      </a>
+      <a class="sidebar__item" href="/settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Me
+      </a>
+    </div>
+    <div class="sidebar__footer">
+      <div class="sidebar__user" id="sidebarUser">
+        <div class="avatar" id="sidebarAvatar">JD</div>
+        <div>
+          <div class="sidebar__user-name" id="sidebarName">John Doe</div>
+          <div class="sidebar__user-role">Premium Member</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- Mobile header -->
+    <div class="page-header-mobile">
+      <div style="font-size:20px; font-weight:800; color: var(--green);">Cue</div>
+      <div class="flex gap-2 items-center">
+        <button id="mobileAddBtn" class="add-moment-pill" style="padding: 8px 14px; font-size:12px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add
+        </button>
+        <div class="avatar" id="mobileAvatar" style="width:32px;height:32px;font-size:12px;">JD</div>
+      </div>
+    </div>
+
+    <!-- Month header -->
+    <div class="moments-month-header">
+      <div>
+        <div class="moments-month-header__title" id="monthTitle">January</div>
+        <div class="moments-month-header__sub" id="monthSub">0 of 31 captured</div>
+      </div>
+      <button class="add-moment-pill" id="desktopAddBtn" style="margin-top:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        add today's moment
+      </button>
+    </div>
+
+    <!-- Content grid -->
+    <div class="page-pad" style="padding-top: 0;">
+      <div class="moments-grid" id="momentsGrid">
+
+        <!-- LEFT COLUMN (AI + Nudge on desktop) -->
+        <div class="moments-left-col" id="leftCol">
+
+          <!-- AI Recap card -->
+          <div class="ai-card" id="aiRecapCard" style="display:none;">
+            <div class="ai-card__label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+              CUE · TODAY
+            </div>
+            <div class="ai-card__text" id="aiRecapText">Generating your daily reflection…</div>
+          </div>
+
+          <!-- Nudge / amber card -->
+          <div class="amber-banner" id="nudgeCard" style="display:none;">
+            <div class="amber-banner__icon">💡</div>
+            <div>
+              <div class="amber-banner__label">Nudge</div>
+              <div class="amber-banner__text" id="nudgeText"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN (moment cards) -->
+        <div class="moments-right-col" id="momentsList">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+
+      <!-- Add moment dashed button (bottom, mobile) -->
+      <button class="add-moment-btn mt-4" id="dashedAddBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        + add today's moment
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── BOTTOM NAV (mobile) ────────────────────────────── -->
+  <nav class="bottom-nav">
+    <a class="bottom-nav__item active" href="/moments.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+      Moments
+    </a>
+    <a class="bottom-nav__item" href="/habits.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Habits
+    </a>
+    <a class="bottom-nav__item" href="/progress.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Progress
+    </a>
+    <a class="bottom-nav__item" href="/settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Me
+    </a>
+  </nav>
+
+</div>
+
+<!-- ── ADD / EDIT MOMENT MODAL ─────────────────────────── -->
+<div class="modal-overlay" id="momentModal">
+  <div class="modal">
+    <div class="modal__handle"></div>
+    <div class="modal__title" id="modalTitle">Log a Moment</div>
+
+    <form id="momentForm" novalidate>
+      <!-- Tag selector -->
+      <div style="margin-bottom:16px;">
+        <div class="input-label">Tag</div>
+        <div class="tag-selector">
+          <button type="button" class="tag-btn selected" data-tag="milestone">Milestone</button>
+          <button type="button" class="tag-btn" data-tag="adventure">Adventure</button>
+          <button type="button" class="tag-btn" data-tag="reflection">Reflection</button>
+        </div>
+        <input type="hidden" id="momentTag" value="milestone" />
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Title</div>
+        <input class="input" id="momentTitle" type="text" placeholder="What happened today?" maxlength="80" required />
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div class="input-label">Details</div>
+        <textarea class="input" id="momentBody" placeholder="Tell the story…" rows="4" style="resize:vertical; min-height:100px;"></textarea>
+      </div>
+
+      <div id="momentFormMsg" style="display:none; font-size:13px; margin-bottom:12px;"></div>
+
+      <div class="flex gap-2">
+        <button type="button" class="btn btn--secondary flex-1" id="btnMomentCancel">Cancel</button>
+        <button type="submit" class="btn btn--primary flex-1" id="btnMomentSave" style="width:auto;">Save Moment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="/js/moments.js"></script>
+</body>
+</html>

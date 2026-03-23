@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — Unlock</title>
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <style>
+    .lock-page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: var(--bg);
+      padding: 48px 24px 32px;
+      user-select: none;
+    }
+
+    .lock-brand {
+      align-self: flex-start;
+      margin-bottom: 56px;
+    }
+
+    .lock-brand__name {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+    }
+
+    .lock-brand__sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .lock-fp-btn {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: #1c1c1c;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 32px;
+    }
+
+    .lock-fp-btn:hover { background: #242424; }
+    .lock-fp-btn:active { transform: scale(0.94); }
+    .lock-fp-btn.scanning { animation: fpPulse 1.5s ease-in-out infinite; }
+
+    @keyframes fpPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.3); }
+      50%       { box-shadow: 0 0 0 16px rgba(34,197,94,0); }
+    }
+
+    .lock-pin-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .pin-keypad {
+      width: 100%;
+      max-width: 300px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .pin-key {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 16px;
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text-primary);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.12s;
+      touch-action: manipulation;
+    }
+
+    .pin-key:active,
+    .pin-key.pressed {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .pin-key--special {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    .pin-key--confirm svg {
+      width: 28px;
+      height: 28px;
+      color: var(--green);
+    }
+
+    .pin-key--delete svg {
+      width: 22px;
+      height: 22px;
+      color: var(--text-muted);
+    }
+
+    .pin-dots {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .pin-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--border-muted);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .pin-dot.active {
+      background: var(--green);
+      transform: scale(1.2);
+    }
+
+    .lock-error {
+      display: none;
+      font-size: 13px;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    @keyframes shakeX {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-10px); }
+      40%       { transform: translateX(10px); }
+      60%       { transform: translateX(-8px); }
+      80%       { transform: translateX(8px); }
+    }
+
+    .shake { animation: shakeX 0.4s ease; }
+  </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+
+<div class="lock-page" id="lockPage">
+
+  <!-- Brand -->
+  <div class="lock-brand">
+    <div class="lock-brand__name">Cue</div>
+    <div class="lock-brand__sub">your daily ritual</div>
+  </div>
+
+  <!-- Fingerprint button -->
+  <button class="lock-fp-btn" id="btnFingerprint" title="Use fingerprint">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" stroke="var(--green)" stroke-width="1.6" stroke-linecap="round">
+      <!-- Fingerprint SVG paths -->
+      <path d="M19 10.5A14 14 0 0 1 40 24c0 4-1 9-2.5 12"/>
+      <path d="M13 17a14 14 0 0 0-1 7c0 6.5 2 12 5 15"/>
+      <path d="M26 10a14 14 0 0 1 8 12.5c0 3.5-.7 8-2 11"/>
+      <path d="M22 41.5c-1.5-3-2-7-2-10 0-4.5 2.7-8 6.5-9"/>
+      <path d="M22.5 15.5A9 9 0 0 1 35 24c0 4-1.2 9-3 12.5"/>
+      <path d="M19 27c0-4.1 3.1-7.5 7-7.5s7 3.4 7 7.5c0 3.5-.8 7-2 9.5"/>
+      <path d="M26 19.5c2.2 0 4 2 4 4.5 0 3-.6 6-1.5 8"/>
+    </svg>
+  </button>
+
+  <!-- PIN dots -->
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="dot0"></div>
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
+  </div>
+
+  <!-- Label -->
+  <div class="lock-pin-label">Enter PIN or use fingerprint</div>
+
+  <!-- Error -->
+  <div class="lock-error" id="lockError">Incorrect PIN. Try again.</div>
+
+  <!-- Keypad -->
+  <div class="pin-keypad" id="pinKeypad">
+    <div class="pin-key" data-key="1">1</div>
+    <div class="pin-key" data-key="2">2</div>
+    <div class="pin-key" data-key="3">3</div>
+    <div class="pin-key" data-key="4">4</div>
+    <div class="pin-key" data-key="5">5</div>
+    <div class="pin-key" data-key="6">6</div>
+    <div class="pin-key" data-key="7">7</div>
+    <div class="pin-key" data-key="8">8</div>
+    <div class="pin-key" data-key="9">9</div>
+
+    <!-- Delete -->
+    <div class="pin-key pin-key--special pin-key--delete" data-key="delete">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+        <line x1="18" y1="9" x2="13" y2="14"/>
+        <line x1="13" y1="9" x2="18" y2="14"/>
+      </svg>
+    </div>
+
+    <div class="pin-key" data-key="0">0</div>
+
+    <!-- Confirm -->
+    <div class="pin-key pin-key--special pin-key--confirm" data-key="confirm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { getUser } from './js/auth.js';
+
+  // ── Auth check ─────────────────────────────────────────
+  const user = await getUser();
+  if (!user) {
+    window.location.replace('/login.html');
+  }
+
+  // ── PIN state ──────────────────────────────────────────
+  let pinInput = [];
+  const MAX_LEN = 4;
+
+  function updateDots() {
+    for (let i = 0; i < MAX_LEN; i++) {
+      const dot = document.getElementById('dot' + i);
+      dot.classList.toggle('active', i < pinInput.length);
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('lockError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    // Shake the dots
+    const dots = document.getElementById('pinDots');
+    dots.classList.remove('shake');
+    void dots.offsetWidth; // reflow
+    dots.classList.add('shake');
+    setTimeout(() => dots.classList.remove('shake'), 500);
+  }
+
+  function clearError() {
+    document.getElementById('lockError').style.display = 'none';
+  }
+
+  // ── PIN hashing (simple SHA-256 via Web Crypto) ────────
+  async function hashPin(pin) {
+    const encoder = new TextEncoder();
+    const data    = encoder.encode(pin);
+    const hash    = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // ── Verify PIN ─────────────────────────────────────────
+  async function verifyPin(pin) {
+    const stored = localStorage.getItem('cue_pin_hash');
+    if (!stored) {
+      // No PIN set — store this as the first PIN (setup flow)
+      const hash = await hashPin(pin);
+      localStorage.setItem('cue_pin_hash', hash);
+      unlock();
+      return;
+    }
+    const hash = await hashPin(pin);
+    if (hash === stored) {
+      unlock();
+    } else {
+      pinInput = [];
+      updateDots();
+      showError('Incorrect PIN. Try again.');
+    }
+  }
+
+  function unlock() {
+    sessionStorage.setItem('cue_unlocked', 'true');
+    window.location.replace('/habits.html');
+  }
+
+  // ── Keypad handler ─────────────────────────────────────
+  document.getElementById('pinKeypad').addEventListener('click', async (e) => {
+    const key = e.target.closest('[data-key]')?.dataset.key;
+    if (!key) return;
+
+    clearError();
+
+    // Visual press feedback
+    const el = e.target.closest('[data-key]');
+    el.classList.add('pressed');
+    setTimeout(() => el.classList.remove('pressed'), 100);
+
+    if (key === 'delete') {
+      if (pinInput.length > 0) pinInput.pop();
+      updateDots();
+      return;
+    }
+
+    if (key === 'confirm') {
+      if (pinInput.length === MAX_LEN) {
+        await verifyPin(pinInput.join(''));
+      } else if (pinInput.length > 0) {
+        showError('Enter all 4 digits.');
+      }
+      return;
+    }
+
+    if (pinInput.length < MAX_LEN) {
+      pinInput.push(key);
+      updateDots();
+      // Auto-submit when 4 digits entered
+      if (pinInput.length === MAX_LEN) {
+        setTimeout(() => verifyPin(pinInput.join('')), 250);
+      }
+    }
+  });
+
+  // ── Physical keyboard support ──────────────────────────
+  document.addEventListener('keydown', async (e) => {
+    clearError();
+    if (/^[0-9]$/.test(e.key) && pinInput.length < MAX_LEN) {
+      pinInput.push(e.key);
+      updateDots();
+      if (pinInput.length === MAX_LEN) {
+        setTimeout(() => verifyPin(pinInput.join('')), 250);
+      }
+    } else if (e.key === 'Backspace') {
+      if (pinInput.length > 0) { pinInput.pop(); updateDots(); }
+    } else if (e.key === 'Enter') {
+      if (pinInput.length === MAX_LEN) await verifyPin(pinInput.join(''));
+    }
+  });
+
+  // ── Fingerprint / WebAuthn ─────────────────────────────
+  const fpBtn = document.getElementById('btnFingerprint');
+  const biometricEnabled = localStorage.getItem('cue_biometric_enabled') === 'true';
+
+  if (!biometricEnabled) {
+    fpBtn.style.opacity = '0.4';
+    fpBtn.title = 'Enable fingerprint in Settings';
+  }
+
+  fpBtn.addEventListener('click', async () => {
+    if (!biometricEnabled) {
+      showError('Enable fingerprint unlock in Settings → Security.');
+      return;
+    }
+
+    if (!window.PublicKeyCredential) {
+      showError('Biometric authentication not supported on this device.');
+      return;
+    }
+
+    fpBtn.classList.add('scanning');
+
+    try {
+      // For WebAuthn: check if a credential is stored
+      const credentialId = localStorage.getItem('cue_credential_id');
+      if (!credentialId) {
+        fpBtn.classList.remove('scanning');
+        showError('No biometric credential registered. Use PIN to unlock.');
+        return;
+      }
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge: crypto.getRandomValues(new Uint8Array(32)),
+          allowCredentials: [{
+            id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0)),
+            type: 'public-key',
+          }],
+          userVerification: 'required',
+          timeout: 30000,
+        }
+      });
+
+      fpBtn.classList.remove('scanning');
+      if (assertion) unlock();
+
+    } catch (err) {
+      fpBtn.classList.remove('scanning');
+      if (err.name !== 'NotAllowedError') {
+        showError('Biometric failed. Use your PIN instead.');
+      }
+    }
+  });
+
+  updateDots();
+</script>
+
+</body>
+</html>

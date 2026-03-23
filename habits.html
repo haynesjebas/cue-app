@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — Habits</title>
+  <meta name="description" content="Track your daily rituals and build lasting habits." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <style>
+    /* ── Habits hero header ─────────────────────── */
+    .habits-hero {
+      padding: 20px 20px 0;
+    }
+
+    @media (min-width: 768px) {
+      .habits-hero {
+        padding: 28px 32px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+    }
+
+    .habits-hero__date {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    @media (min-width: 768px) {
+      .habits-hero__date { font-size: 52px; }
+    }
+
+    .habits-hero__sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* dash progress row */
+    .dash-progress {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dash-seg {
+      width: 16px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border-muted);
+    }
+
+    .dash-seg.done {
+      background: var(--green);
+    }
+
+    /* Score label */
+    .weekly-score-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      margin-left: auto;
+    }
+
+    /* ── Desktop two-column layout ──────────────── */
+    @media (min-width: 768px) {
+      .habits-body {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+        align-items: start;
+        padding: 24px 32px;
+      }
+    }
+
+    /* ── Monthly donut card ──────────────────────── */
+    .monthly-donut-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .monthly-donut-card__title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .monthly-donut-card__sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .monthly-donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .monthly-donut-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -0.03em;
+    }
+
+    .monthly-donut-target {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Stat cards row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-mini {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .stat-mini__label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-mini__value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .stat-mini__sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .stat-mini__change {
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* New ritual button */
+    .new-ritual-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color var(--t), background var(--t);
+      margin-top: 12px;
+    }
+
+    .new-ritual-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+  </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ── SIDEBAR (desktop) ─────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Cue</div>
+      <div class="sidebar__brand-sub">The Ritual</div>
+    </div>
+    <div class="sidebar__nav">
+      <a class="sidebar__item" href="/moments.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+        Moments
+      </a>
+      <a class="sidebar__item active" href="/habits.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Habits
+      </a>
+      <a class="sidebar__item" href="/progress.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Progress
+      </a>
+      <a class="sidebar__item" href="/settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Me
+      </a>
+    </div>
+    <div class="sidebar__footer">
+      <div class="sidebar__user" id="sidebarUser">
+        <div class="avatar" id="sidebarAvatar">JD</div>
+        <div>
+          <div class="sidebar__user-name" id="sidebarName">John Doe</div>
+          <div class="sidebar__user-role">Pro Member</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- Mobile header -->
+    <div class="page-header-mobile">
+      <div style="font-size:20px;font-weight:800;color:var(--green);">Cue</div>
+      <div class="flex gap-2 items-center">
+        <button style="background:none;border:none;cursor:pointer;color:var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <div class="avatar" id="mobileAvatar" style="width:32px;height:32px;font-size:12px;">JD</div>
+      </div>
+    </div>
+
+    <!-- Amber alert banner -->
+    <div class="amber-banner" id="alertBanner" style="display:none; margin: 12px 20px;">
+      <div class="amber-banner__icon">⚡</div>
+      <div>
+        <div class="amber-banner__label">Ritual Alert</div>
+        <div class="amber-banner__text" id="alertText"></div>
+      </div>
+    </div>
+
+    <!-- Hero date header -->
+    <div class="habits-hero">
+      <div>
+        <div class="habits-hero__date" id="heroDate">Today · 22 Jan</div>
+        <div class="habits-hero__sub">
+          <span id="heroSub">0 of 0 done</span>
+          <div class="dash-progress" id="dashProgress"></div>
+          <span class="weekly-score-label" id="weeklyScore"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight banner (desktop) -->
+    <div class="amber-banner" id="insightBanner" style="display:none; margin: 16px 32px 0;">
+      <div class="amber-banner__icon">💡</div>
+      <div style="flex:1;">
+        <div class="amber-banner__label">Ritual Insight</div>
+        <div class="amber-banner__text" id="insightText"></div>
+      </div>
+      <button class="btn--amber" id="viewTrendsBtn" style="flex-shrink:0;">View Trends</button>
+    </div>
+
+    <!-- Body: two-col on desktop -->
+    <div class="habits-body page-pad">
+
+      <!-- LEFT: habits sections -->
+      <div id="habitsLeft">
+
+        <!-- DAILY section -->
+        <div style="margin-bottom:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div class="section-label">Daily</div>
+            <div class="section-label" id="streakLabel" style="color:var(--text-faint);">Streak</div>
+          </div>
+          <div id="dailyList" style="display:flex;flex-direction:column;gap:10px;">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- WEEKLY section -->
+        <div style="margin-bottom:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div class="section-label">Weekly</div>
+            <div class="section-label" id="weeklyDoneLabel" style="color:var(--text-faint);"></div>
+          </div>
+          <div class="grid-2" id="weeklyList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- MONTHLY section -->
+        <div style="margin-bottom:28px;" id="monthlySection">
+          <div class="section-label" style="margin-bottom:12px;">Monthly</div>
+          <div id="monthlyList" style="display:flex;flex-direction:column;gap:10px;">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: monthly goal + stats (desktop) -->
+      <div id="habitsRight" style="display:flex;flex-direction:column;gap:12px;">
+
+        <!-- Monthly Goal card -->
+        <div class="monthly-donut-card" id="monthlyGoalCard" style="display:none;">
+          <div class="section-label" style="margin-bottom:12px;">Monthly Goal</div>
+          <div class="monthly-donut-card__title" id="monthlyGoalTitle">—</div>
+          <div class="monthly-donut-card__sub" id="monthlyGoalSub"></div>
+          <div class="monthly-donut-wrap">
+            <div>
+              <div class="monthly-donut-value" id="monthlyGoalValue">—</div>
+              <div class="monthly-donut-target" id="monthlyGoalTarget"></div>
+            </div>
+            <!-- Circular progress -->
+            <div style="margin-left:auto;">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle class="circular-progress__track" cx="40" cy="40" r="32"/>
+                <circle class="circular-progress__fill" id="donutCircle"
+                  cx="40" cy="40" r="32"
+                  stroke-dasharray="201.1"
+                  stroke-dashoffset="201.1"
+                  transform="rotate(-90 40 40)"
+                />
+                <text x="40" y="46" text-anchor="middle"
+                  font-size="14" font-weight="700" fill="#e2e2e2"
+                  id="donutLabel">0%</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-mini">
+            <div class="stat-mini__label">Ritual Score</div>
+            <div class="stat-mini__value" id="ritualScore">—</div>
+            <div class="stat-mini__change" id="ritualScoreChange"></div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini__label">Active Days</div>
+            <div class="stat-mini__value" id="activeDays">—</div>
+            <div class="stat-mini__sub" id="activeDaysSub"></div>
+          </div>
+        </div>
+
+        <!-- New Ritual button -->
+        <button class="new-ritual-btn" id="newRitualBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + New Ritual
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── BOTTOM NAV (mobile) ────────────────────────────── -->
+  <nav class="bottom-nav">
+    <a class="bottom-nav__item" href="/moments.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+      Moments
+    </a>
+    <a class="bottom-nav__item active" href="/habits.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Habits
+    </a>
+    <a class="bottom-nav__item" href="/progress.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Progress
+    </a>
+    <a class="bottom-nav__item" href="/settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Me
+    </a>
+  </nav>
+
+</div>
+
+<!-- ── NEW RITUAL MODAL ───────────────────────────────────── -->
+<div class="modal-overlay" id="newRitualModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal__handle"></div>
+    <div class="modal__title">New Ritual</div>
+
+    <form id="newRitualForm" novalidate>
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Name</div>
+        <input class="input" id="ritualName" type="text" placeholder="e.g. Morning Meditation" required />
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Type</div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="tag-btn selected" data-type="daily" id="typeDaily">Daily</button>
+          <button type="button" class="tag-btn" data-type="weekly" id="typeWeekly">Weekly</button>
+          <button type="button" class="tag-btn" data-type="monthly" id="typeMonthly">Monthly</button>
+        </div>
+        <input type="hidden" id="ritualType" value="daily" />
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Target <span style="color:var(--text-faint);">(times per period)</span></div>
+        <input class="input" id="ritualTarget" type="number" value="1" min="1" max="100" />
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div class="input-label">Icon (emoji)</div>
+        <input class="input" id="ritualIcon" type="text" placeholder="💧" maxlength="4" />
+      </div>
+
+      <div id="ritualFormMsg" style="display:none;font-size:13px;margin-bottom:12px;"></div>
+
+      <div class="flex gap-2">
+        <button type="button" class="btn btn--secondary flex-1" id="btnRitualCancel">Cancel</button>
+        <button type="submit" class="btn btn--primary flex-1" style="width:auto;">Create Ritual</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="/js/habits.js"></script>
+</body>
+</html>

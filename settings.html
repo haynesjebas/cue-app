@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — Me</title>
+  <meta name="description" content="Your profile, security, and preferences." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <style>
+    /* ── Me page layout ─────────────────────────────── */
+    .me-header {
+      padding: 24px 20px 0;
+    }
+
+    @media (min-width: 768px) {
+      .me-header {
+        padding: 28px 32px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+      }
+    }
+
+    .me-header__title {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .me-header__underline {
+      width: 32px;
+      height: 3px;
+      background: var(--green);
+      border-radius: 2px;
+      margin-top: 8px;
+    }
+
+    .me-header__actions {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .me-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .me-header__title { font-size: 48px; }
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color var(--t), background var(--t);
+      position: relative;
+    }
+
+    .icon-btn:hover { border-color: var(--border-muted); background: #111; }
+
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 1.5px solid var(--bg);
+    }
+
+    /* Desktop two-col layout */
+    @media (min-width: 768px) {
+      .me-body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 32px;
+        padding: 32px;
+        align-items: start;
+      }
+    }
+
+    /* Profile left column */
+    .profile-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .profile-col { padding: 0; }
+    }
+
+    .profile-avatar-wrap {
+      position: relative;
+      width: fit-content;
+    }
+
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .profile-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Profile nav rows */
+    .profile-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: border-color var(--t), background var(--t);
+    }
+
+    .profile-nav-row:hover {
+      border-color: var(--border-muted);
+      background: #0f0f0f;
+    }
+
+    /* Sign out row */
+    .signout-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      color: var(--red);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .settings-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    /* System active indicator (desktop sidebar bottom) */
+    .system-active {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .system-active {
+        display: block;
+        padding: 0 12px 16px;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+      }
+    }
+
+    .logout-footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      cursor: pointer;
+      border-top: 1px solid var(--border);
+      margin-top: 16px;
+      transition: color var(--t);
+    }
+
+    .logout-footer:hover { color: var(--red); }
+
+    .version-text {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-faint);
+      padding: 0 0 16px;
+    }
+  </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ── SIDEBAR (desktop) ─────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Cue</div>
+      <div class="sidebar__brand-sub">The Ritual</div>
+    </div>
+    <div class="sidebar__nav">
+      <a class="sidebar__item" href="/moments.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+        Moments
+      </a>
+      <a class="sidebar__item" href="/habits.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Habits
+      </a>
+      <a class="sidebar__item" href="/progress.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Progress
+      </a>
+      <a class="sidebar__item active" href="/settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Me
+      </a>
+    </div>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="avatar" id="sidebarAvatar">JD</div>
+        <div>
+          <div class="sidebar__user-name" id="sidebarName">John Doe</div>
+          <div class="sidebar__user-role">Premium Member</div>
+        </div>
+      </div>
+    </div>
+    <div class="system-active">System Active</div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+  <div class="main-content">
+
+    <!-- Mobile header (green Cue + settings icon) -->
+    <div class="page-header-mobile" style="border-bottom:1px solid var(--border);">
+      <div style="font-size:22px;font-weight:800;color:var(--green);">Cue</div>
+      <div class="flex gap-2 items-center">
+        <button style="background:none;border:none;cursor:pointer;color:var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Desktop page header -->
+    <div class="me-header">
+      <div>
+        <div class="me-header__title">Me</div>
+        <div class="me-header__underline"></div>
+      </div>
+      <div class="me-header__actions">
+        <!-- Notification bell -->
+        <div class="icon-btn">
+          <div class="notif-dot"></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <!-- Settings gear -->
+        <div class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <!-- Avatar -->
+        <div class="avatar" id="headerAvatar">JD</div>
+      </div>
+    </div>
+
+    <!-- Body: two-col on desktop -->
+    <div class="me-body">
+
+      <!-- LEFT: Profile -->
+      <div class="profile-col">
+        <!-- Avatar -->
+        <div class="profile-avatar-wrap">
+          <div class="avatar avatar--xl" id="profileAvatar">JD</div>
+          <div class="avatar-edit-btn" id="editAvatarBtn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+        </div>
+
+        <div>
+          <div class="profile-name" id="profileName">John Doe</div>
+          <div class="profile-email" id="profileEmail">j.doe@ritual.cue</div>
+        </div>
+
+        <!-- Profile nav rows (desktop left column) -->
+        <div class="profile-nav-row">
+          <span>Public Profile</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <div class="profile-nav-row">
+          <span>Data & Privacy</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <!-- RIGHT: Settings sections -->
+      <div style="display:flex;flex-direction:column;gap:24px;" class="page-pad" style="padding-top:0;">
+
+        <!-- ACCOUNT section -->
+        <div>
+          <div class="settings-section-title">Account</div>
+          <div class="settings-group">
+
+            <!-- Email -->
+            <div class="settings-row">
+              <div class="settings-row__left">
+                <div class="settings-row__title">Email Address</div>
+                <div class="settings-row__sub">Primary contact for notifications and recovery</div>
+              </div>
+              <div class="settings-row__right">
+                <span id="emailDisplay" style="font-size:12px;color:var(--text-muted);">—</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-row__chevron"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+
+            <!-- Google sign-in toggle (mobile) / row (desktop) -->
+            <div class="settings-row" id="googleLinkRow" style="display:none;">
+              <div class="settings-row__left">
+                <div class="settings-row__title">Google Account</div>
+                <div class="settings-row__sub" id="googleLinkSub">Not connected</div>
+              </div>
+              <div class="settings-row__right">
+                <button class="btn btn--secondary" id="btnGoogleLink" style="padding:4px 12px; font-size:11px; height:auto; width:auto; border-radius:4px;">Connect</button>
+              </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="settings-row" style="align-items:center;">
+              <div class="settings-row__left" style="flex:1;">
+                <div class="settings-row__title">Name</div>
+              </div>
+              <div class="settings-row__right" style="flex:2;justify-content:flex-end;">
+                <input class="input" id="personalNameInput" type="text" style="width:100%;max-width:200px;background:transparent;border-color:transparent;text-align:right;padding:0;color:var(--text-primary);font-weight:600;" placeholder="Your Name" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECURITY section -->
+        <div>
+          <div class="settings-section-title">Security</div>
+          <div class="settings-group">
+
+            <!-- App lock PIN -->
+            <div class="settings-row">
+              <div class="settings-row__left">
+                <div class="settings-row__title">App Lock PIN</div>
+                <div class="settings-row__sub">Require a 4-digit PIN to access Cue</div>
+              </div>
+              <div class="settings-row__right">
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="pinToggle" />
+                  <div class="slider"></div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Fingerprint Unlock -->
+            <div class="settings-row">
+              <div class="settings-row__left">
+                <div class="settings-row__title">Fingerprint Unlock</div>
+                <div class="settings-row__sub">Use biometric data for rapid access<br><span style="font-size:10px;color:var(--text-faint);">Works on mobile after app installation</span></div>
+              </div>
+              <div class="settings-row__right">
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="biometricToggle" />
+                  <div class="slider"></div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="settings-row" id="changePasswordRow">
+              <div class="settings-row__left">
+                <div class="settings-row__title">Change Password</div>
+              </div>
+              <div class="settings-row__right">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-row__chevron"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- APPEARANCE section -->
+        <div>
+          <div class="settings-section-title">Appearance</div>
+          <div class="settings-group">
+
+            <!-- Dark mode -->
+            <div class="settings-row">
+              <div class="settings-row__left">
+                <div class="settings-row__title">Dark mode</div>
+                <div class="settings-row__sub" style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);">Light mode coming soon</div>
+              </div>
+              <div class="settings-row__right">
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="darkModeToggle" checked />
+                  <div class="slider"></div>
+                </label>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- Sign out (mobile) -->
+        <div class="signout-row" id="signoutRow">
+          <span>Sign Out</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+
+        <div class="version-text">Version 2.4.0 (Build 892)</div>
+
+      </div>
+
+    </div>
+
+    <!-- Desktop logout footer -->
+    <div class="logout-footer" id="logoutFooter">Logout from Ritual</div>
+
+  </div>
+
+  <!-- ── BOTTOM NAV (mobile) ────────────────────────────── -->
+  <nav class="bottom-nav">
+    <a class="bottom-nav__item" href="/moments.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.8 5.4H20l-4.8 3.6 1.8 5.4L12 13l-5 3.4 1.8-5.4L4 7.4h6.2z"/></svg>
+      Moments
+    </a>
+    <a class="bottom-nav__item" href="/habits.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Habits
+    </a>
+    <a class="bottom-nav__item" href="/progress.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Progress
+    </a>
+    <a class="bottom-nav__item active" href="/settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Me
+    </a>
+  </nav>
+
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePasswordModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal__handle"></div>
+    <div class="modal__title">Change Password</div>
+    <div style="margin-bottom:12px;">
+      <div class="input-label">New Password</div>
+      <input class="input" id="newPassword" type="password" placeholder="Min 8 characters" />
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="input-label">Confirm Password</div>
+      <input class="input" id="confirmPassword" type="password" placeholder="Repeat password" />
+    </div>
+    <div id="pwMsg" style="display:none;font-size:13px;margin-bottom:12px;"></div>
+    <div class="flex gap-2">
+      <button class="btn btn--secondary flex-1" id="btnPwCancel">Cancel</button>
+      <button class="btn btn--primary flex-1" id="btnPwSave" style="width:auto;">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Set PIN Modal -->
+<div class="modal-overlay" id="setPinModal">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div class="modal__handle"></div>
+    <div class="modal__title" style="text-align:center;">Set App Lock PIN</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
+      Enter a 4-digit PIN. You'll use this to unlock Cue.
+    </p>
+    <input class="input" id="newPinInput" type="password"
+      inputmode="numeric" pattern="[0-9]*" maxlength="4"
+      placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:8px;" />
+    <div id="pinMsg" style="display:none;font-size:13px;margin:12px 0;"></div>
+    <div class="flex gap-2 mt-4">
+      <button class="btn btn--secondary flex-1" id="btnPinCancel">Cancel</button>
+      <button class="btn btn--primary flex-1" id="btnPinSave" style="width:auto;">Set PIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="/js/settings.js"></script>
+</body>
+</html>

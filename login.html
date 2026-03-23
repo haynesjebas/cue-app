@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — Sign In</title>
+  <meta name="description" content="Sign in to Cue — your personal daily ritual." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <script src="/config.js"></script>
+</head>
+<body>
+
+<!-- ── LOGIN PAGE ─────────────────────────────────────────── -->
+<div class="login-page" id="loginPage">
+
+  <!-- Mobile brand (hidden on desktop) -->
+  <div class="login-brand-mobile">
+    <div class="login-brand-mobile__name">Cue</div>
+    <div class="login-brand-mobile__sub">Your Daily Ritual</div>
+  </div>
+
+  <!-- Desktop brand (hidden on mobile) -->
+  <div class="login-brand-desktop">
+    <div class="login-brand-desktop__name">Cue</div>
+    <div class="login-brand-desktop__sub">The Ritual</div>
+  </div>
+
+  <!-- Auth card -->
+  <div class="login-card fade-in">
+
+    <!-- Google sign-in -->
+    <button class="social-btn" id="btnGoogle" type="button">
+      <!-- Google G icon -->
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <!-- Apple sign-in -->
+    <button class="social-btn" id="btnApple" type="button" style="margin-top: 10px;">
+      <!-- Apple icon -->
+      <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor">
+        <path d="M13.314 9.493c-.022-2.18 1.783-3.24 1.863-3.293-1.015-1.483-2.595-1.685-3.155-1.705-1.336-.136-2.614.79-3.292.79-.677 0-1.718-.773-2.829-.751-1.44.021-2.777.843-3.517 2.135C.805 9.086 1.89 13.403 3.544 15.739c.822 1.19 1.8 2.52 3.081 2.471 1.24-.05 1.706-.8 3.205-.8 1.5 0 1.921.8 3.224.774 1.33-.023 2.174-1.213 2.987-2.41.947-1.38 1.334-2.72 1.354-2.788-.03-.012-2.594-.997-2.618-3.493h-.463z"/>
+        <path d="M11.12 3.08c.68-.825 1.14-1.97.013-3.08-1.056.042-2.33.704-3.08 1.553-.673.763-1.263 1.985-1.104 3.157 1.181.092 2.387-.604 3.17-1.63z"/>
+      </svg>
+      Continue with Apple
+    </button>
+
+    <!-- OR divider -->
+    <div class="divider">or</div>
+
+    <!-- Email/password form -->
+    <form id="loginForm" novalidate>
+      <div style="margin-bottom: 12px;">
+        <div class="input-label">Email Address</div>
+        <input
+          class="input"
+          id="inputEmail"
+          type="email"
+          placeholder="ritual@cue.app"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div class="input-label">Password</div>
+          <button type="button" id="btnForgot" style="font-size:11px; font-weight:700; color: var(--green); letter-spacing:0.08em; text-transform:uppercase; background:none; border:none; cursor:pointer;">
+            Forgot?
+          </button>
+        </div>
+        <input
+          class="input"
+          id="inputPassword"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <!-- Error message -->
+      <div id="errorMsg" style="display:none; color: var(--red); font-size:13px; margin-bottom:12px; text-align:center;"></div>
+
+      <!-- Continue button -->
+      <button class="btn btn--primary" id="btnContinue" type="submit">Continue</button>
+
+      <div style="text-align:center; margin-top:16px; font-size:13px; color: var(--text-muted);">
+        New to the ritual?
+        <a href="#" id="btnCreateAccount" style="color: var(--green); font-weight:600;">Create Account</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Inspirational quote -->
+  <div class="login-quote">
+    "Discipline is the bridge between goals and accomplishment.
+    Every ritual is a brick in the path of progress."
+  </div>
+
+</div>
+
+<!-- ── FORGOT PASSWORD MODAL ──────────────────────────────── -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal__handle"></div>
+    <div class="modal__title">Reset Password</div>
+    <p style="font-size:13px; color: var(--text-muted); margin-bottom:20px;">
+      Enter your email and we'll send a reset link.
+    </p>
+    <input class="input" id="forgotEmail" type="email" placeholder="ritual@cue.app" style="margin-bottom:16px;" />
+    <div id="forgotMsg" style="display:none; font-size:13px; margin-bottom:12px;"></div>
+    <div class="flex gap-2">
+      <button class="btn btn--secondary flex-1" id="btnForgotCancel">Cancel</button>
+      <button class="btn btn--primary flex-1" id="btnForgotSend" style="width:auto;">Send Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CREATE ACCOUNT MODAL ───────────────────────────────── -->
+<div class="modal-overlay" id="signupModal">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal__handle"></div>
+    <div class="modal__title">Join the Ritual</div>
+    <form id="signupForm" novalidate>
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Full Name</div>
+        <input class="input" id="signupName" type="text" placeholder="John Doe" required />
+      </div>
+      <div style="margin-bottom:12px;">
+        <div class="input-label">Email Address</div>
+        <input class="input" id="signupEmail" type="email" placeholder="ritual@cue.app" required />
+      </div>
+      <div style="margin-bottom:20px;">
+        <div class="input-label">Password</div>
+        <input class="input" id="signupPassword" type="password" placeholder="Min 8 characters" required />
+      </div>
+      <div id="signupMsg" style="display:none; font-size:13px; margin-bottom:12px;"></div>
+      <div class="flex gap-2">
+        <button type="button" class="btn btn--secondary flex-1" id="btnSignupCancel">Cancel</button>
+        <button type="submit" class="btn btn--primary flex-1" style="width:auto;">Create Account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  }
+</script>
+
+<script type="module">
+  import { signInWithEmail, signInWithGoogle, signInWithApple, signUpWithEmail, resetPassword, getUser } from './js/auth.js';
+  import { upsertUserProfile } from './js/db.js';
+
+  // ── Redirect if already logged in ─────────────────────
+  getUser().then(user => {
+    if (user) window.location.replace('/index.html');
+  });
+
+  // ── Toast ──────────────────────────────────────────────
+  function showToast(msg, type = '') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast${type ? ' toast--' + type : ''}`;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  }
+
+  // ── Loading state ──────────────────────────────────────
+  function setLoading(btn, loading) {
+    btn.disabled = loading;
+    btn.style.opacity = loading ? '0.7' : '1';
+  }
+
+  // ── Modal helpers ──────────────────────────────────────
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  // ── Email login ────────────────────────────────────────
+  const loginForm = document.getElementById('loginForm');
+  const errorMsg  = document.getElementById('errorMsg');
+  const btnContinue = document.getElementById('btnContinue');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.style.display = 'none';
+
+    const email    = document.getElementById('inputEmail').value;
+    const password = document.getElementById('inputPassword').value;
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Please fill in all fields.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    setLoading(btnContinue, true);
+    btnContinue.textContent = 'Signing in…';
+
+    const { user, error } = await signInWithEmail(email, password);
+
+    if (error || !user) {
+      setLoading(btnContinue, false);
+      btnContinue.textContent = 'Continue';
+      errorMsg.textContent = error?.message ?? 'Sign-in failed. Check your credentials.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    await upsertUserProfile(user);
+    window.location.replace('/index.html');
+  });
+
+  // ── Google sign-in ─────────────────────────────────────
+  document.getElementById('btnGoogle').addEventListener('click', async () => {
+    const btn = document.getElementById('btnGoogle');
+    setLoading(btn, true);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setLoading(btn, false);
+      showToast('Google sign-in failed: ' + error.message, 'error');
+    }
+    // On success, Supabase redirects to habits.html automatically
+  });
+
+  // ── Apple sign-in ──────────────────────────────────────
+  document.getElementById('btnApple').addEventListener('click', async () => {
+    const btn = document.getElementById('btnApple');
+    setLoading(btn, true);
+    const { error } = await signInWithApple();
+    if (error) {
+      setLoading(btn, false);
+      showToast('Apple sign-in failed: ' + error.message, 'error');
+    }
+  });
+
+  // ── Forgot password modal ──────────────────────────────
+  document.getElementById('btnForgot').addEventListener('click', () => openModal('forgotModal'));
+  document.getElementById('btnForgotCancel').addEventListener('click', () => closeModal('forgotModal'));
+
+  document.getElementById('btnForgotSend').addEventListener('click', async () => {
+    const email = document.getElementById('forgotEmail').value;
+    const msgEl = document.getElementById('forgotMsg');
+    if (!email) {
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = 'Enter your email address.';
+      msgEl.style.display = 'block';
+      return;
+    }
+    const btn = document.getElementById('btnForgotSend');
+    setLoading(btn, true);
+    const { error } = await resetPassword(email);
+    setLoading(btn, false);
+    if (error) {
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = error.message;
+    } else {
+      msgEl.style.color = 'var(--green)';
+      msgEl.textContent = 'Reset link sent — check your inbox.';
+    }
+    msgEl.style.display = 'block';
+  });
+
+  // ── Create account modal ───────────────────────────────
+  document.getElementById('btnCreateAccount').addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal('signupModal');
+  });
+  document.getElementById('btnSignupCancel').addEventListener('click', () => closeModal('signupModal'));
+
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name     = document.getElementById('signupName').value;
+    const email    = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const msgEl    = document.getElementById('signupMsg');
+
+    if (!name || !email || !password) {
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = 'Please fill in all fields.';
+      msgEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 8) {
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = 'Password must be at least 8 characters.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    const btn = e.submitter;
+    setLoading(btn, true);
+    const { user, error } = await signUpWithEmail(email, password, name);
+    setLoading(btn, false);
+
+    if (error || !user) {
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = error?.message ?? 'Sign-up failed.';
+      msgEl.style.display = 'block';
+      return;
+    }
+
+    await upsertUserProfile(user);
+    closeModal('signupModal');
+    showToast('Account created! Check your email to confirm.', 'success');
+  });
+</script>
+
+</body>
+</html>

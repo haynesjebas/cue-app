@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue — The Ritual</title>
+  <meta name="description" content="Cue — your daily ritual habit tracker." />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #1a1a1a;
+      border-top-color: #22c55e;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+  <div class="spinner"></div>
+
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
+  </script>
+
+  <script type="module">
+    import { getUser, checkLock } from './js/auth.js';
+
+    async function route() {
+      const user = await getUser();
+
+      if (!user) {
+        window.location.replace('/login.html');
+        return;
+      }
+
+      // Check if app lock is enabled
+      const lockEnabled = localStorage.getItem('cue_lock_enabled') === 'true';
+      const unlocked    = sessionStorage.getItem('cue_unlocked') === 'true';
+
+      if (lockEnabled && !unlocked) {
+        window.location.replace('/lock.html');
+        return;
+      }
+
+      // Default landing page after auth
+      window.location.replace('/habits.html');
+    }
+
+    route();
+  </script>
+</body>
+</html>
